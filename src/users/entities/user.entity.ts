@@ -1,3 +1,4 @@
+import { Template } from 'src/templates/entities/template.entity';
 import {
   Column,
   CreateDateColumn,
@@ -19,6 +20,8 @@ export class User {
   password: string;
   @Column({ type: 'varchar', default: 'user' })
   role: string;
+  @OneToMany(() => Template, (template) => template.user)
+  templates: Template[];
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
   @UpdateDateColumn({ type: 'timestamp' })

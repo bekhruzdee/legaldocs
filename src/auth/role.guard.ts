@@ -21,6 +21,6 @@ export class RolesGuard implements CanActivate {
       throw new UnauthorizedException('You are not allowed');
     }
 
-    return true; // ✅ Faqat adminlar kirishi mumkin
+    return true;
   }
 }
