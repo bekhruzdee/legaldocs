@@ -8,6 +8,7 @@ import {
   Delete,
   Get,
   UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { TemplatesService } from './templates.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -27,10 +28,8 @@ export class TemplatesController {
       storage: diskStorage({
         destination: './uploads',
         filename: (req, file, callback) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const ext = extname(file.originalname);
-          callback(null, `${uniqueSuffix}${ext}`);
+          const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+          callback(null, `${uniqueSuffix}${extname(file.originalname)}`);
         },
       }),
     }),
@@ -56,13 +55,33 @@ export class TemplatesController {
 
   @Get(':id')
   @UseGuards(AuthGuard)
-  async getTemplateById(@Param('id') id: number) {
+  async getTemplateById(@Param('id', ParseIntPipe) id: number) {
     return this.templatesService.getTemplateById(id);
   }
 
   @Delete(':id')
   @UseGuards(AuthGuard, RolesGuard)
-  async deleteTemplate(@Param('id') id: number) {
+  async deleteTemplate(@Param('id', ParseIntPipe) id: number) {
     return this.templatesService.deleteTemplate(id);
+  }
+
+  @Get(':id/extract-text')
+  @UseGuards(AuthGuard)
+  async extractText(@Param('id', ParseIntPipe) id: number) {
+    const template = await this.templatesService.getTemplateById(id);
+    return this.templatesService.extractText(template.template.filePath);
+  }
+
+  @Post(':id/redact')
+  @UseGuards(AuthGuard)
+  async redactFile(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: { edits: { page?: number; text: string }[] },
+  ) {
+    const template = await this.templatesService.getTemplateById(id);
+    return this.templatesService.redactFile(
+      template.template.filePath,
+      body.edits,
+    );
   }
 }
