@@ -19,7 +19,6 @@ export class TemplatesService {
     private templatesRepository: Repository<Template>,
   ) {}
 
-  // === TEMPLATES CRUD === //
   async createTemplate(
     name: string,
     filePath: string,
@@ -71,7 +70,6 @@ export class TemplatesService {
     return { message: `Template with ID ${id} deleted successfully.` };
   }
 
-  // === TEXT EXTRACTION === //
   async extractText(filePath: string) {
     const ext = path.extname(filePath).toLowerCase();
     if (ext === '.pdf') return this.extractTextFromPDF(filePath);
@@ -103,7 +101,6 @@ export class TemplatesService {
     }
   }
 
-  // === TEXT REDACTION === //
   async redactFile(filePath: string, edits: { page?: number; text: string }[]) {
     const ext = path.extname(filePath).toLowerCase();
     if (ext === '.pdf') return this.redactPDF(filePath, edits);
@@ -137,7 +134,10 @@ export class TemplatesService {
       const result = await mammoth.extractRawText({ path: filePath });
       let modifiedText = result.value;
       edits.forEach((edit) => {
-        modifiedText = modifiedText.replace(new RegExp(edit.text, 'gi'), '[REDACTED]');
+        modifiedText = modifiedText.replace(
+          new RegExp(edit.text, 'gi'),
+          '[REDACTED]',
+        );
       });
       const newFilePath = filePath.replace('.docx', '_redacted.docx');
       await writeFile(newFilePath, modifiedText, 'utf-8');

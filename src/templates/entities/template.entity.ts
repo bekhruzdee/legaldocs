@@ -17,10 +17,10 @@ export class Template {
   name: string;
 
   @Column({ type: 'varchar' })
-  filePath: string; // ✅ Asl PDF fayl yo‘li
+  filePath: string;
 
   @Column({ type: 'varchar', nullable: true })
-  redactedFilePath?: string; // ✅ Redakt qilingan versiya (Agar bo‘lsa)
+  redactedFilePath?: string;
 
   @Column('json', { nullable: true })
   placeholders: Record<string, string>;
