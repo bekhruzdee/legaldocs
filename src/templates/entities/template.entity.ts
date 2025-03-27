@@ -19,8 +19,8 @@ export class Template {
   @Column({ type: 'varchar' })
   filePath: string;
 
-  @Column({ type: 'varchar', nullable: true })
-  redactedFilePath?: string;
+  // @Column({ type: 'varchar', nullable: true })
+  // redactedFilePath?: string;
 
   @Column('json', { nullable: true })
   placeholders: Record<string, string>;

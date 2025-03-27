@@ -41,31 +41,62 @@ export class AuthService {
     return 'You are registered✅';
   }
 
+  // async login(loginDto: { username: string; password: string }, res: Response) {
+  //   const user = await this.userRepository.findOneBy({
+  //     username: loginDto.username,
+  //   });
+  //   if (!user) {
+  //     throw new NotFoundException('User Not Found ⚠️');
+  //   }
+  //   const checkPass = await bcrypt.compare(loginDto.password, user.password);
+  //   if (!checkPass) {
+  //     throw new NotFoundException('Password Error ⚠️');
+  //   }
+
+  //   const payload = { id: user.id, username: user.username, role: user.role };
+  //   const accessToken = this.jwtService.sign(payload, { expiresIn: '1d' });
+  //   const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+
+  //   res.cookie('refresh_token', refreshToken, {
+  //     httpOnly: true,
+  //     secure: process.env.NODE_ENV === 'production',
+  //     maxAge: 7 * 24 * 60 * 60 * 1000,
+  //   });
+
+  //   const { password, ...userData } = user;
+  //   return res.json({ userData, access_token: accessToken });
+  // }
+
   async login(loginDto: { username: string; password: string }, res: Response) {
-    const user = await this.userRepository.findOneBy({
-      username: loginDto.username,
-    });
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.username = :username', { username: loginDto.username })
+      .addSelect('user.password') // Parolni qo'shamiz
+      .getOne();
+  
     if (!user) {
       throw new NotFoundException('User Not Found ⚠️');
     }
+  
     const checkPass = await bcrypt.compare(loginDto.password, user.password);
     if (!checkPass) {
       throw new NotFoundException('Password Error ⚠️');
     }
-
+  
     const payload = { id: user.id, username: user.username, role: user.role };
     const accessToken = this.jwtService.sign(payload, { expiresIn: '1d' });
     const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
-
+  
     res.cookie('refresh_token', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-
+  
     const { password, ...userData } = user;
     return res.json({ userData, access_token: accessToken });
   }
+  
 
   logout(): { message: string } {
     return { message: 'Logout successfully✅' };
