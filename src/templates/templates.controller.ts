@@ -68,8 +68,8 @@ export class TemplatesController {
   @Get(':id/extract-text')
   @UseGuards(AuthGuard)
   async extractText(@Param('id', ParseIntPipe) id: number) {
-    const template = await this.templatesService.getTemplateById(id);
-    return this.templatesService.extractText(template.template.filePath);
+    const result = await this.templatesService.getTemplateById(id);
+    return this.templatesService.extractText(result.template.filePath);
   }
 
   @Post(':id/redact')
@@ -78,9 +78,9 @@ export class TemplatesController {
     @Param('id', ParseIntPipe) id: number,
     @Body() body: { edits: { page?: number; text: string }[] },
   ) {
-    const template = await this.templatesService.getTemplateById(id);
+    const result = await this.templatesService.getTemplateById(id);
     return this.templatesService.redactFile(
-      template.template.filePath,
+      result.template.filePath,
       body.edits,
     );
   }
