@@ -8,6 +8,7 @@ import { UserModule } from './users/users.module';
 import { User } from './users/entities/user.entity';
 import { TemplatesModule } from './templates/templates.module';
 import { Template } from './templates/entities/template.entity';
+import { storage, uploadFile } from './utils/file.utils' 
 @Module({
   imports: [
     ConfigModule.forRoot(),
